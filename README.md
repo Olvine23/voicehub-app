@@ -39,9 +39,9 @@ Voice Hub is a creative platform designed for writers and artists, with a primar
    flutter pub get
    
 4.  Run the app
-
    ```bash
- flutter run
+   flutter run
+```
 
 ## Contributing
 
