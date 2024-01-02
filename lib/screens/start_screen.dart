@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:voice_hub/core/colors.dart';
+import 'package:voice_hub/screens/auth/signup.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
@@ -70,7 +72,9 @@ class StartScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Get.off(SignupScreen());
+                  },
                   child: Container(
                     height: 66,
                     decoration: BoxDecoration(
