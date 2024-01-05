@@ -1,13 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voice_hub/controllers/signupcontroller.dart';
 
 import 'package:voice_hub/core/colors.dart';
-import 'package:voice_hub/core/globals.dart';
-import 'package:voice_hub/screens/auth/email_verification.dart';
+import 'package:voice_hub/models/user_model.dart';
 import 'package:voice_hub/screens/auth/signin.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -19,98 +18,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   bool value = false;
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  bool isLoading = false;
-  final TextEditingController fullNameTextController =
-      TextEditingController(text: '');
-  final TextEditingController emailTextController =
-      TextEditingController(text: '');
-  final TextEditingController passwordTextController =
-      TextEditingController(text: '');
-  final TextEditingController confirmPasswordTextController =
-      TextEditingController(text: '');
-  final TextEditingController phoneNumberTextController =
-      TextEditingController(text: '');
-
   final _formKey = GlobalKey<FormState>();
-    @override
-   void dispose() {
-    fullNameTextController.dispose();
-    emailTextController.dispose();
-    passwordTextController.dispose();
-    phoneNumberTextController.dispose();
- 
-    super.dispose();
-  }
-  void submitFormOnSignup() async {
-    showDialog(
-        context: context,
-        builder: ((context) {
-          return Center(child: CircularProgressIndicator());
-        }));
-
-    final isValid = _formKey.currentState!.validate();
-    if (isValid) {
-      // if (imageFile == null) {
-      //   GlobalMethod.showErrorDialog(
-      //       error: "Please pick an image", ctx: context);
-      //   return;
-      // }
-
-      setState(() {
-        isLoading = true;
-      });
-      try {
-        if (passwordTextController.text == passwordTextController.text) {
-          await _auth.createUserWithEmailAndPassword(
-            email: emailTextController.text.trim().toLowerCase(),
-            password: passwordTextController.text.trim(),
-          );
-          final User? user = _auth.currentUser;
-          if (user != null) {}
-          final uid = user!.uid;
-          // final ref = FirebaseStorage.instance
-          //     .ref()
-          //     .child('userImages')
-          //     .child('$uid.jpg');
-          // //.child(uid + '.jpg');
-          // await ref.putFile(imageFile!);
-          // imageUrl = await ref.getDownloadURL();
-          await FirebaseFirestore.instance.collection('users').doc(uid).set({
-            'id': uid,
-            'name': fullNameTextController.text,
-            'email': emailTextController.text,
-            'phoneNumber': phoneNumberTextController.text,
-           
-            'createdAt': Timestamp.now(),
-            "profile":
-                FirebaseFirestore.instance.collection("profile").doc(uid),
-          });
-          // ignore: use_build_context_synchronously
-
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: ((context) {
-            return EmailVerificationScreen();
-          })));
-        } else {
-          GlobalMethod.showErrorDialog(
-              error: "Passwords dont match", ctx: context);
-        }
-        // Navigator.pushReplacement(context,
-        //     MaterialPageRoute(builder: (context) => AccountCreatedPage()));
-      } catch (error) {
-        setState(() {
-          isLoading = false;
-        });
-        GlobalMethod.showErrorDialog(error: error.toString(), ctx: context);
-        print("error occurred $error");
-      }
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: fullNameTextController,
+                          controller: controller.fullName,
                           decoration: InputDecoration(
                               prefixIcon:
                                   Icon(Icons.person, color: AppColors.darkGrey),
@@ -188,7 +96,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: emailTextController,
+                          controller: controller.email,
                           decoration: InputDecoration(
                               prefixIcon:
                                   Icon(Icons.email, color: AppColors.darkGrey),
@@ -225,7 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller:phoneNumberTextController,
+                          controller: controller.phoneNo,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.phone_android,
@@ -263,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller:passwordTextController,
+                          controller: controller.password,
                           decoration: InputDecoration(
                               suffixIcon: Icon(Icons.visibility_off),
                               prefixIcon: Icon(Icons.lock),
@@ -305,7 +213,17 @@ class _SignupScreenState extends State<SignupScreen> {
                         minimumSize: const Size.fromHeight(60), //
                       ),
                       onPressed: () {
-                       submitFormOnSignup();
+                        final currentUser = FirebaseAuth.instance.currentUser;
+                        final user = UserModel(
+                           
+                            authorType: "ddddd",
+                            fullName: "hddd",
+                            profileImage: "poji",
+                            bio: "ddd",
+                            preferences: "jaji",
+                            email: controller.email.text.trim(),
+                            password: controller.password.text.trim());
+                        SignupController.instance.createUser(user);
                       },
                       child: const Text(
                         "Login",
@@ -349,7 +267,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ..onTap = () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => SignIn())),
+                                      builder: (context) => SigninScreen())),
                             text: 'Login',
                             style: TextStyle(
                                 color: AppColors.primaryColor,

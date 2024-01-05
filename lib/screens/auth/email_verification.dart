@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
  
 import 'package:voice_hub/core/colors.dart';
 import 'package:voice_hub/core/firebasr_constants.dart';
-import 'package:voice_hub/screens/splash/splash_screen.dart';
-
+import 'package:voice_hub/screens/home/home_screen.dart';
+ 
  
 
 class EmailVerificationScreen extends StatefulWidget {
