@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:voice_hub/controllers/profilecontroller.dart';
 import 'package:voice_hub/screens/poems/add_poem.dart';
+import 'package:voice_hub/screens/poems/poem_detail.dart';
 import 'package:voice_hub/screens/poems/poems_list_screen.dart';
 import 'package:voice_hub/services/authservice.dart';
 import 'package:voice_hub/widgets/bottom_navbar.dart';
@@ -61,7 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
             Get.to(PoemListScreen());
 
-          }, child: Text("See poems"))
+          }, child: Text("See poems")),
+
+           ElevatedButton(onPressed: (){
+
+            Get.to(RealTimePoemListScreen());
+
+          }, child: Text("See other poems"))
         ],
       ),)
     );
