@@ -8,6 +8,7 @@ import 'package:voice_hub/controllers/signupcontroller.dart';
 import 'package:voice_hub/core/colors.dart';
 import 'package:voice_hub/models/user_model.dart';
 import 'package:voice_hub/screens/auth/signin.dart';
+import 'package:voice_hub/services/authservice.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,6 +20,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   bool value = false;
   final _formKey = GlobalKey<FormState>();
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: controller.fullName,
+                          controller: controller.nicknameController,
                           decoration: InputDecoration(
                               prefixIcon:
                                   Icon(Icons.person, color: AppColors.darkGrey),
@@ -96,7 +98,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: controller.email,
+                          controller: controller.emailController,
                           decoration: InputDecoration(
                               prefixIcon:
                                   Icon(Icons.email, color: AppColors.darkGrey),
@@ -133,7 +135,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: controller.phoneNo,
+                          controller: controller.phoneController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               prefixIcon: Icon(Icons.phone_android,
@@ -171,7 +173,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Card(
                         borderOnForeground: false,
                         child: TextFormField(
-                          controller: controller.password,
+                          controller: controller.passwordController,
                           decoration: InputDecoration(
                               suffixIcon: Icon(Icons.visibility_off),
                               prefixIcon: Icon(Icons.lock),
@@ -213,17 +215,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         minimumSize: const Size.fromHeight(60), //
                       ),
                       onPressed: () {
-                        final currentUser = FirebaseAuth.instance.currentUser;
-                        final user = UserModel(
-                           
-                            authorType: "ddddd",
-                            fullName: "hddd",
-                            profileImage: "poji",
-                            bio: "ddd",
-                            preferences: "jaji",
-                            email: controller.email.text.trim(),
-                            password: controller.password.text.trim());
-                        SignupController.instance.createUser(user);
+                        authService.register(email: controller.emailController.text.trim(), password: controller.passwordController.text.trim(), nickname: controller.nicknameController.text.trim(), bio: controller.bioController.text.trim(),  phone: controller.phoneController.text.trim());
+               
                       },
                       child: const Text(
                         "Login",

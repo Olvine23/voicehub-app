@@ -9,7 +9,7 @@ class UserRepository extends GetxController {
  
 
    Future<void> createUser(UserModel user) async {
-    try {
+    try { 
       await FirebaseFirestore.instance.collection('usersCollection').add(user.toJson());
       Get.snackbar("Success", "Account created");
     } catch (error, stackTrace) {
@@ -18,4 +18,20 @@ class UserRepository extends GetxController {
       Get.snackbar("Error", "An error occurred while creating the account");
     }
   }
+
+Future<UserModel> getUserDetails(String email) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection("usersCollection")
+      .where("email", isEqualTo: email)
+      .get();
+
+  if (snapshot.docs.isNotEmpty) {
+    final userData = UserModel.fromSnapshot(snapshot.docs.first);
+    return userData;
+  } else {
+    // Handle the case where no document matches the given email
+    throw Exception("No user found with the provided email");
+  }
+}
+
 }

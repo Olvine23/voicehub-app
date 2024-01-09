@@ -11,10 +11,11 @@ class SignupController extends GetxController{
   static SignupController get instance => Get.find();
 
   //TextField Controllers to get data from TextFields
-  final email = TextEditingController();
-  final password = TextEditingController();
-  final fullName = TextEditingController();
-  final phoneNo = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nicknameController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
   final userRepo = Get.put(UserRepository());
   

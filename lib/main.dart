@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.ebGaramondTextTheme(),
         useMaterial3: true,
       ),
-      home: const UserState(),
+      home: const StartScreen(),
+      // home: const UserState(),
     );
   }
 }
