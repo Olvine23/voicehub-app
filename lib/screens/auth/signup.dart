@@ -44,6 +44,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     height: 12,
                   ),
+                  IconButton(onPressed: (){
+                    AuthService().showImageDialog(context);
+                  }, icon: Icon(Icons.camera)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
@@ -215,7 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         minimumSize: const Size.fromHeight(60), //
                       ),
                       onPressed: () {
-                        authService.register(email: controller.emailController.text.trim(), password: controller.passwordController.text.trim(), nickname: controller.nicknameController.text.trim(), bio: controller.bioController.text.trim(),  phone: controller.phoneController.text.trim());
+                        authService.register(preferences: '',  email: controller.emailController.text.trim(), password: controller.passwordController.text.trim(), nickname: controller.nicknameController.text.trim(), bio: controller.bioController.text.trim(),  phone: controller.phoneController.text.trim());
                
                       },
                       child: const Text(

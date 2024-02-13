@@ -40,7 +40,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text('Email: ${currentUserDetails!['email']}'),
                   Text('Nickname: ${currentUserDetails!['nickname']}'),
                   Text('Bio: ${currentUserDetails!['bio']}'),
-                  Text('Preferences: ${currentUserDetails!['phone']}'),
+                  Text('Preferences: ${currentUserDetails!['preferences']}'),
+                  Text(currentUserDetails!['image']),
+                  Image.network(currentUserDetails!['image'])
+                   
                   // Add more details as needed
                 ],
               )

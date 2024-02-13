@@ -24,7 +24,7 @@ class SignupController extends GetxController{
     registerUser(user.email, user.password);
     print(FirebaseAuth.instance.currentUser?.uid);
     await userRepo.createUser(user);
-    Get.to(HomeScreen());
+    Get.to(HomeScreen( ));
   }
 
   //Call this Function from Design & it will do the rest

@@ -39,6 +39,10 @@ class PoemListScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(poem.title),
                   subtitle: Text(poem.body),
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(poem.imageUrl),
+                    radius: 30,
+                  ),
                   onTap: () {
                    
                   },

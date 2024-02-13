@@ -1,24 +1,45 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:voice_hub/controllers/profilecontroller.dart';
+import 'package:voice_hub/core/colors.dart';
+import 'package:voice_hub/models/poetry_model.dart';
+import 'package:voice_hub/screens/home/home.dart';
+import 'package:voice_hub/screens/home/widgets/image_container.dart';
+import 'package:voice_hub/screens/home/widgets/most_recent.dart';
 import 'package:voice_hub/screens/poems/add_poem.dart';
-import 'package:voice_hub/screens/poems/poem_detail.dart';
 import 'package:voice_hub/screens/poems/poems_list_screen.dart';
+import 'package:voice_hub/screens/profile/profile_screen.dart';
+import 'package:voice_hub/screens/search/search_screen.dart';
 import 'package:voice_hub/services/authservice.dart';
 import 'package:voice_hub/widgets/bottom_navbar.dart';
 
-import '../../models/user_model.dart';
+import '../../controllers/user_controller.dart';
+import '../../models/article_model.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-   final AuthService authService = AuthService();
+  final PageController pageController = PageController(initialPage: 0);
+  final UserController userController = Get.put(UserController());
+  //sets icons for the  bottom navbar
+
+  List<Map> navigationBarItems = [
+    {'icon': Icons.home, 'index': 0},
+    {'icon': Icons.explore, 'index': 1},
+    {'icon': Icons.apps, 'index': 2},
+    {'icon': Icons.person, 'index': 3}
+  ];
+
+//checks currently         icon
+  int selectedIndex = 0;
+
+  final AuthService authService = AuthService();
 
   Map<String, dynamic>? currentUserDetails;
 
@@ -31,46 +52,300 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadCurrentUserDetails() async {
     Map<String, dynamic>? details = await authService.getCurrentUserDetails();
 
-    setState(() {
-      currentUserDetails = details;
-    });
+    if (mounted) {
+      setState(() {
+        currentUserDetails = details;
+        
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> screens = [
+      Home(),
+      SearchScreen(),
+      PoemListScreen(),
+      ProfileScreen()
+    ];
     print(currentUserDetails?['email']);
-      print(currentUserDetails?['phone']);
+    print(currentUserDetails?['phone']);
+
     print(FirebaseAuth.instance.currentUser?.uid);
     var user = FirebaseAuth.instance.currentUser?.email;
     return Scaffold(
-      bottomNavigationBar: BottomNavBar(),
-      appBar: AppBar(
-        title: Text('Voice Hub Home'),
-      ),
-      body:  Center(child: 
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Logged in as ... $user"),
-          ElevatedButton(onPressed: (){
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+            shape: const CircleBorder(),
+            backgroundColor: AppColors.primaryColor,
+            foregroundColor: AppColors.white,
+            child: const Icon(Icons.add),
+            onPressed: () {
+              Get.to(AddPoemScreen(imageUrl: ''));
+            }),
+        bottomNavigationBar: BottomAppBar(
+          color: AppColors.primaryColor,
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 10.0,
+          clipBehavior: Clip.antiAlias,
+          child: SizedBox(
+              width: double.infinity,
+              height: kBottomNavigationBarHeight,
+              child: SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: BottomNavigationBar(
+                    elevation: 0,
+                    type: BottomNavigationBarType.fixed,
+                    backgroundColor: AppColors.primaryColor,
+                    currentIndex: selectedIndex,
+                    unselectedItemColor: Colors.white,
+                    selectedItemColor: Color(0xffB1816D),
+                    onTap: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                        pageController.jumpToPage(index);
+                      });
+                    },
+                    items: [
+                       
+                      const BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.home_outlined,
+                            size: 30,
+                          ),
+                          label: "Home"),
+                          
+                      const BottomNavigationBarItem(
+                          icon: Icon(Icons.explore_outlined), label: "Explore"),
+                      const BottomNavigationBarItem(
+                          icon: Icon(Icons.apps_outlined), label: "Creations"),
+                      BottomNavigationBarItem(
+                          icon: CircleAvatar(
+                            radius: 12,
+                            backgroundImage:
+                                NetworkImage(currentUserDetails?['image']),
+                          ),
+                          label: "Profile")
+                    ]),
+              )),
+        ),
+//       bottomNavigationBar: BottomNavigationBar(items: [
+//         for(var navItem in navigationBarItems)
+//         BottomNavigationBarItem(icon: Container(
+//           height: 40,
+//           decoration: BoxDecoration(
+//              border: Border(
+//                       top: selectedIndex == navItem['index']
+//                           ? BorderSide(
+//                               color:AppColors.primaryColor, width: 5)
+//                           : BorderSide.none,
+//                     ),
+//           ),
 
-            Get.to(AddPoemScreen());
+//           child: Icon(navItem['icon'], color: selectedIndex == 0 ? AppColors.primaryColor : Colors.black),
+//         ),
+//         label: ''
+//         ),
 
-          }, child: Text("Add a poem")),
+//       ],
+// currentIndex: selectedIndex,
+// onTap: (value) => setState((){
 
-           ElevatedButton(onPressed: (){
+//   selectedIndex = value;
 
-            Get.to(PoemListScreen());
+// }),
+//       ),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.transparent,
+        //   actions: [
+        //     GestureDetector(
+        //       onTap: () {
+        //         Get.to(AddPoemScreen(
+        //           imageUrl: '',
+        //         ));
+        //       },
+        //       child: CircleAvatar(
+        //         radius: 40,
+        //         backgroundImage: NetworkImage(currentUserDetails?['image']),
+        //       ),
+        //     )
+        //   ],
+        //   title: Image.asset('assets/images/voicehub.png',
+        //   height: 100,),
+        //   elevation: 0,
+        // ),
+        body: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: pageController,
+          children: screens,
+        )
+        // extendBodyBehindAppBar: true,
+        // body: ListView(
 
-          }, child: Text("See poems")),
+        //   padding: EdgeInsets.zero,
+        //   children: [
+        //      Text(
+        //         'Hello, ${currentUserDetails!['nickname']}',
+        //         style: TextStyle(  fontWeight: FontWeight.bold),
+        //       ),
+        //     // Padding(
+        //     //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        //     //   child: DiscoverNews(),
+        //     // ),
 
-           ElevatedButton(onPressed: (){
+        //     Padding(
+        //       padding: const EdgeInsets.all(8.0),
+        //       child: ImageContainer(
+        //           padding: EdgeInsets.symmetric(horizontal: 20),
+        //           height: 200,
+        //           width: double.infinity,
+        //           imageUrl:
+        //               'https://images.pexels.com/photos/247314/pexels-photo-247314.jpeg?cs=srgb&dl=pexels-pixabay-247314.jpg&fm=jpg'),
+        //     ),
+        //     // const TopPoem(),
+        //     StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        //         stream:
+        //             FirebaseFirestore.instance.collection('poems').snapshots(),
+        //         builder: (context,
+        //             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        //           if (snapshot.connectionState == ConnectionState.waiting) {
+        //             return Center(
+        //               child: CircularProgressIndicator(),
+        //             );
+        //           } else if (snapshot.hasError) {
+        //             return Center(
+        //               child: Text("Error ${snapshot.error}"),
+        //             );
+        //           } else {
+        //             List<QueryDocumentSnapshot<Map<String, dynamic>>> poems =
+        //                 snapshot.data!.docs;
 
-            Get.to(RealTimePoemListScreen());
+        //             return Padding(
+        //               padding: EdgeInsets.all(20),
+        //               child: Column(
+        //                 children: [
+        //                   Row(
+        //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //                     children: [
+        //                       Text(
+        //                         "Most Recent",
+        //                         style: Theme.of(context)
+        //                             .textTheme
+        //                             .headlineSmall!
+        //                             .copyWith(fontWeight: FontWeight.bold),
+        //                       ),
+        //                       InkWell(
+        //                           onTap: () {},
+        //                           child: Text("More",
+        //                               style:
+        //                                   Theme.of(context).textTheme.bodyLarge)),
+        //                     ],
+        //                   ),
+        //                   SizedBox(
+        //                     height: 3,
+        //                   ),
+        //                   SizedBox(
+        //                     height: 250,
+        //                     child: ListView.builder(
+        //                         scrollDirection: Axis.horizontal,
+        //                         itemCount: poems.length,
+        //                         itemBuilder: (context, index) {
+        //                           PoetryModel poem =
+        //                               PoetryModel.fromMap(poems[index].data()!);
+        //                           return Container(
+        //                             width:
+        //                                 MediaQuery.of(context).size.width * 0.5,
+        //                             margin: EdgeInsets.only(right: 15),
+        //                             child: Column(
+        //                               crossAxisAlignment:
+        //                                   CrossAxisAlignment.start,
+        //                               children: [
+        //                                 ImageContainer(
+        //                                     width: MediaQuery.of(context)
+        //                                             .size
+        //                                             .width *
+        //                                         0.5,
+        //                                     imageUrl: poem.imageUrl),
+        //                                 Text(
+        //                                   poem.title,
+        //                                   style: Theme.of(context)
+        //                                       .textTheme
+        //                                       .bodyLarge!
+        //                                       .copyWith(
+        //                                           fontWeight: FontWeight.bold),
+        //                                 ),
+        //                                 Row(
+        //                                   children: [
+        //                                     Expanded(
+        //                                         child: Text(
+        //                                             'Uploaded by ${poem.uploadedBy}',
+        //                                             style: Theme.of(context)
+        //                                                 .textTheme
+        //                                                 .bodySmall!
+        //                                                 .copyWith(
+        //                                                     fontWeight: FontWeight
+        //                                                         .bold))),
+        //                                     Expanded(
+        //                                         child: CircleAvatar(
+        //                                       radius: 25,
+        //                                       backgroundColor: Colors.purple,
+        //                                       backgroundImage: NetworkImage(
+        //                                           currentUserDetails!['image']),
+        //                                     ))
+        //                                   ],
+        //                                 )
+        //                               ],
+        //                             ),
+        //                           );
+        //                         }),
+        //                   )
+        //                 ],
+        //               ),
+        //             );
+        //           }
+        //         }),
 
-          }, child: Text("See other poems"))
-        ],
-      ),)
-    );
+        //     // MostRecent(
+        //     //   articles: Article.articles,
+        //     // )
+        //   ],
+        // ),
+        // body:  Center(child:
+        // Column(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Text("Logged in as ... $user"),
+        //     ElevatedButton(onPressed: (){
+
+        //       Get.to(AddPoemScreen(imageUrl: '',));
+
+        //     }, child: Text("Add a poem")),
+
+        //      ElevatedButton(onPressed: (){
+
+        //       Get.to(ProfileScreen());
+
+        //     }, child: Text("See profile")),
+
+        //      ElevatedButton(onPressed: (){
+
+        //       Get.to(BioPreferencesScreen());
+
+        //     }, child: Text("See my details")),
+        //     ElevatedButton(onPressed: (){
+
+        //       Get.to(PixabayImageSelector());
+
+        //     }, child: Text("See photos")),
+
+        //     ElevatedButton(onPressed: (){
+
+        //       Get.to( LoadingScreen());
+
+        //     }, child: Text("See poems")),
+
+        //   ],
+        // ),)
+        );
   }
 }

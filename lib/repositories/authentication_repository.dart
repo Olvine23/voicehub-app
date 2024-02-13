@@ -25,7 +25,7 @@ class AuthenticationRepository extends GetxController {
   _setInitialScreen(User? user) {
     user == null
         ? Get.offAll(() => const StartScreen())
-        : Get.offAll(() => HomeScreen());
+        : Get.offAll(() => HomeScreen( ));
   }
 
    //FUNC

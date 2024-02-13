@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
  
 
   final List<Widget> _screens = [
-    HomeScreen(),
+    HomeScreen( ),
     SearchScreen(),
     ProfileScreen(),
   ];
@@ -34,17 +34,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
             icon: Icons.home,
           ),
           GButton(
-            text: 'Search',
-            icon: Icons.search,
+            text: 'Discover',
+            icon: Icons.explore
           ),
           GButton(
-            text: 'Favorites',
-            icon: Icons.favorite,
+            text: 'My Creations',
+            icon: Icons.apps,
           ),
-          GButton(
+
+           GButton(
             text: 'Profile',
             icon: Icons.person,
+            iconSize: 30,
           ),
+          
         ],
         selectedIndex: _selectedIndex,
         onTabChange: (index) {
